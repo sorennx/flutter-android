@@ -1,0 +1,12 @@
+<translations>
+  <button_enter_name_text>Please enter your name</button_enter_name_text>
+  <button_enter_name_hint>Please enter your name</button_enter_name_hint>
+  <button_enter_name_label>Name</button_enter_name_label>
+  <button_enter_lastname_text>Please enter your lastname</button_enter_lastname_text>
+  <button_enter_lastname_hint>Please enter your lastname</button_enter_lastname_hint>
+  <button_enter_lastname_label>Lastname</button_enter_lastname_label>
+  <button_enter_grades_amount_text>Please enter amount of your grades</button_enter_grades_amount_text>
+  <button_enter_grades_amount_hint>Please enter amount of your grades</button_enter_grades_amount_hint>
+  <button_enter_grades_amount_label>Grades count</button_enter_grades_amount_label>
+  <button_enter_grades_amount_error>The amount of grades needs to be in range [5,15]</button_enter_grades_amount_error>
+</translations>

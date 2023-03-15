@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:xml/xml.dart';
+import 'dart:io';
 void main() {
   runApp(const MyApp());
 }
@@ -54,16 +55,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final _lastNameController = TextEditingController();
   final _gradesCountController = TextEditingController();
 
-  // void _incrementCounter() {
-  //   setState(() {
-  //     // This call to setState tells the Flutter framework that something has
-  //     // changed in this State, which causes it to rerun the build method below
-  //     // so that the display can reflect the updated values. If we changed
-  //     // _counter without calling setState(), then the build method would not be
-  //     // called again, and so nothing would appear to happen.
-  //     _counter++;
-  //   });
-  // }
   bool isFormValid = false;
   bool _showSubmitButton = false;
   void _submitButtonVisibilityHandler() {
@@ -74,6 +65,21 @@ class _MyHomePageState extends State<MyHomePage> {
       print(isFormValid);
     });
   }
+  XmlDocument getTranslations(){
+    
+    File file = File('en-en.xml');
+    return XmlDocument.parse(file.readAsStringSync());
+  }
+  final user_lang = "en-en";
+  
+  XmlDocument translations = XmlDocument();
+
+  // String to = document.findAllElements('to').first.text;
+  // String from = document.findAllElements('from').first.text;
+  // String heading = document.findAllElements('heading').first.text;
+  // String body = document.findAllElements('body').first.text;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -83,88 +89,89 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    translations = getTranslations();
+    print(translations);
     return Scaffold(
+      
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: Text(widget.title),
         ),
         body: Form(
-                  key: _formKey,
-                  onChanged: () => setState(() =>
-                      _showSubmitButton = _formKey.currentState!.validate()),
-                  child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: <Widget>[
-                          Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: TextFormField(
-                                controller: _nameController,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your name';
-                                  }
-                                  return null;
-                                },
-                                decoration: const InputDecoration(
-                                  labelText: 'Name',
-                                  hintText: 'Please enter your name',
-                                  border: OutlineInputBorder(),
-                                ),
-                              )),
-                          Padding(padding: const EdgeInsets.all(5.0),
-                          child:
-                          TextFormField(
-                            controller: _lastNameController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your lastname';
-                              }
-                              return null;
-                            },
-                            decoration: const InputDecoration(
-                              labelText: 'Lastname',
-                              hintText: 'Please enter your lastname',
-                              border: OutlineInputBorder(),
-                            ),
-                          )),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child:
-                          TextFormField(
-                            controller: _gradesCountController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter amount of your grades';
-                              }
-                              if (int.parse(value) < 5 ||
-                                  int.parse(value) > 15) {
-                                return 'The amount of grades needs to be in range [5,15]';
-                              }
-                              return null;
-                            },
-                            decoration: const InputDecoration(
-                              labelText: 'Grades count',
-                              hintText: 'Please enter amount of your grades',
-                              border: OutlineInputBorder(),
-                            ),
-                          )),
-                          Visibility(
-                              visible: _showSubmitButton,
-                              child: ElevatedButton(
-                                child: const Text('OCENY'),
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    print(_nameController.text);
-                                  }
-                                },
-                              ))
-                        ],
-                      ))));
+            key: _formKey,
+            onChanged: () => setState(
+                () => _showSubmitButton = _formKey.currentState!.validate()),
+            child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: TextFormField(
+                          controller: _nameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return translations.getAttribute('button_enter_name_text');
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Name',
+                            hintText: 'Please enter your name',
+                            border: OutlineInputBorder(),
+                          ),
+                        )),
+                    Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: TextFormField(
+                          controller: _lastNameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your lastname';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Lastname',
+                            hintText: 'Please enter your lastname',
+                            border: OutlineInputBorder(),
+                          ),
+                        )),
+                    Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: TextFormField(
+                          controller: _gradesCountController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter amount of your grades';
+                            }
+                            if (int.parse(value) < 5 || int.parse(value) > 15) {
+                              return 'The amount of grades needs to be in range [5,15]';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Grades count',
+                            hintText: 'Please enter amount of your grades',
+                            border: OutlineInputBorder(),
+                          ),
+                        )),
+                    Visibility(
+                        visible: _showSubmitButton,
+                        child: ElevatedButton(
+                          child: const Text('OCENY'),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              print(_nameController.text);
+                            }
+                          },
+                        ))
+                  ],
+                ))));
   }
 }
