@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:xml/xml.dart';
 import 'dart:io';
+import 'dart:convert';
+import 'dart:async' show Future;
+
 void main() {
   runApp(const MyApp());
 }
@@ -65,22 +68,30 @@ class _MyHomePageState extends State<MyHomePage> {
       print(isFormValid);
     });
   }
-  XmlDocument getTranslations(){
-    
-    File file = File('en-en.xml');
-    return XmlDocument.parse(file.readAsStringSync());
-  }
-  final user_lang = "en-en";
-  
   XmlDocument translations = XmlDocument();
+  Future getTranslations() async {
+    // File file = File('assets/en_en.xml');
+    String xmlString = await loadAsset();
+    translations = XmlDocument.parse(xmlString);
+    // print(translations);
+    // return await XmlDocument.parse(xmlString);
+  }
+
+  Future<String> loadAsset() async {
+    return await rootBundle.loadString('assets/en_en.xml');
+  }
+
+  final user_lang = "en-en";
+
+  
+  // 
+  // XmlDocument a = XmlDocument();
 
   // String to = document.findAllElements('to').first.text;
   // String from = document.findAllElements('from').first.text;
   // String heading = document.findAllElements('heading').first.text;
   // String body = document.findAllElements('body').first.text;
-
-
-
+  // XmlDocument translations = XmlDocument();
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -89,10 +100,14 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    translations = getTranslations();
-    print(translations);
+    // translations = getTranslations();
+    // Future<XmlDocument> translationsFuture = getTranslations();
+    // XmlDocument translations = await translationsFuture; // Allowed
+    // translations = getTranslations() as XmlDocument;
+    // print(translations);
+    getTranslations();
+    // print(translations.findAllElements("button_enter_grades_amount_label").first.text);
     return Scaffold(
-      
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
@@ -112,7 +127,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           controller: _nameController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return translations.getAttribute('button_enter_name_text');
+                              return translations
+                                  .findAllElements('button_enter_name_text').first.text;
                             }
                             return null;
                           },
