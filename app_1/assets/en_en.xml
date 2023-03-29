@@ -9,4 +9,21 @@
   <button_enter_grades_amount_hint>Please enter amount of your grades</button_enter_grades_amount_hint>
   <button_enter_grades_amount_label>Grades count xml</button_enter_grades_amount_label>
   <button_enter_grades_amount_error>The amount of grades needs to be in range [5,15]</button_enter_grades_amount_error>
+  <classes>
+    <class>A</class>
+    <class>B</class>
+    <class>C</class>
+    <class>D</class>
+    <class>E</class>
+    <class>F</class>
+    <class>G</class>
+    <class>H</class>
+    <class>I</class>
+    <class>J</class>
+    <class>K</class>
+    <class>L</class>
+    <class>M</class>
+    <class>N</class>
+    <class>O</class>
+  </classes>
 </translations>

@@ -57,8 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      getTranslations().then((value) {
-      });
+      getTranslations().then((value) {});
     });
   }
 
@@ -212,10 +211,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           Visibility(
                               visible: _showSubmitButton,
                               child: ElevatedButton(
-                                child: const Text('OCENY'),
+                                child: const Text('GRADES'),
                                 onPressed: () {
                                   if (_formKey.currentState!.validate()) {
-                                    print(_nameController.text);
+                                    Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) {
+                                      // print("xdd: $.length}");
+                                      return GradesView(
+                                          gradesCount:
+                                              _gradesCountController.text,
+                                          classes: snapshot.data!
+                                              .findAllElements("class"));
+                                    }));
                                   }
                                 },
                               ))
@@ -230,4 +237,78 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+}
+
+class GradesView extends StatefulWidget {
+  final gradesCount;
+  final classes;
+  const GradesView({super.key, this.gradesCount, this.classes});
+  nodesToArray(nodes) {
+    var arr = [];
+    for (var node in nodes) {
+      arr.add(node.text);
+    }
+    return arr;
+  }
+
+  createRadioButtonGroups() {
+    int variable = 6;
+    List<Widget> columns = [];
+
+    for (int i = 0; i < variable; i++) {
+      List<String> options = [];
+
+      for (int j = 1; j < 6; j++) {
+        options.add(j.toString());
+      }
+
+      List<Widget> radios = [];
+
+      for (int k = 0; k < options.length; k++) {
+        radios.add(
+          Row(
+            children: <Widget>[
+              Text((k + 1).toString()),
+              Radio(
+                fillColor:
+                    MaterialStateColor.resolveWith((states) => Colors.green),
+                value: options[k],
+                groupValue: i,
+                onChanged: (value) {
+                  print(value);
+                },
+              ),
+            ],
+          ),
+        );
+      }
+
+      columns.add(
+        Row(
+          children: radios,
+        ),
+      );
+    }
+
+    return Column(
+      children: columns,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var classesList = nodesToArray(classes);
+    int sum = 0;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('My View'),
+      ),
+      body: Center(
+        child: createRadioButtonGroups(),
+      ),
+    );
+  }
+  
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
 }
