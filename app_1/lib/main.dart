@@ -240,9 +240,22 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class GradesView extends StatefulWidget {
+  const GradesView(
+      {super.key, required this.gradesCount, required this.classes});
+
+  // final String title;
   final gradesCount;
   final classes;
-  const GradesView({super.key, this.gradesCount, this.classes});
+
+  @override
+  State<GradesView> createState() => _GradesView(gradesCount, classes);
+}
+
+class _GradesView extends State<GradesView> {
+  String gradesCount;
+  Iterable<XmlElement> classes;
+  _GradesView(this.gradesCount, this.classes);
+
   nodesToArray(nodes) {
     var arr = [];
     for (var node in nodes) {
@@ -265,17 +278,18 @@ class GradesView extends StatefulWidget {
       List<Widget> radios = [];
 
       for (int k = 0; k < options.length; k++) {
+        String b = i.toString();
         radios.add(
           Row(
             children: <Widget>[
               Text((k + 1).toString()),
-              Radio(
-                fillColor:
-                    MaterialStateColor.resolveWith((states) => Colors.green),
+              Radio<String>(
                 value: options[k],
-                groupValue: i,
+                groupValue: b,
                 onChanged: (value) {
-                  print(value);
+                  setState(() {
+                    b = value.toString();
+                  });
                 },
               ),
             ],
@@ -294,21 +308,83 @@ class GradesView extends StatefulWidget {
       children: columns,
     );
   }
+    List<int?> selections = [3,3,3,3,3];
+    
+  createRadioButtonGroupsv2() {
+    int classesCount = 5;
+    List<Widget> rows = [];
 
+    int s1 = 1;
+    int s2 = 1;
+    int s3 = 1;
+    int s4 = 1;
+    int s5 = 1;
+    for (int i = 0; i < classesCount; i++) {
+      Row row = Row(children: [
+      Text('2'),
+      Radio<int>(
+        value: 2,
+        groupValue: selections[i],
+        onChanged: (int? value) {
+          setState(() {
+            selections[i] = value;
+            print(selections);
+          });
+        },
+      ),
+      Text('3'),
+      Radio<int>(
+        value: 3,
+        groupValue: selections[i],
+        onChanged: (int? value) {
+          setState(() {
+            selections[i] = value;
+            print(selections);
+          });
+        },
+      ),
+      Text('4'),
+      Radio<int>(
+        value: 4,
+        groupValue: selections[i],
+        onChanged: (int? value) {
+          setState(() {
+            selections[i] = value;
+            // print(selections);
+          });
+        },
+      ),
+      Text('5'),
+      Radio<int>(
+        value: 5,
+        groupValue: selections[i],
+        onChanged: (int? value) {
+          setState(() {
+            selections[i] = value;
+            // print(selections);
+          });
+          print(selections);
+        },
+      ),
+    ]);
+    rows.add(row);
+    }
+
+    return Column(children: rows);
+  }
+
+  int? _selected = 1;
   @override
   Widget build(BuildContext context) {
     var classesList = nodesToArray(classes);
     int sum = 0;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My View'),
-      ),
-      body: Center(
-        child: createRadioButtonGroups(),
-      ),
-    );
+        appBar: AppBar(
+          title: Text('My View'),
+        ),
+        body: Center(
+          child: createRadioButtonGroupsv2(),
+        ));
   }
-  
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
 }
