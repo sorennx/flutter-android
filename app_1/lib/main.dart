@@ -91,6 +91,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final user_lang = "en-en";
 
+  Future<void> _navigateAndDisplaySelection(
+      BuildContext context, gradesCount, classes) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              GradesView(gradesCount: gradesCount, classes: classes)),
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+    ..removeCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text('$result')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<XmlDocument>(
@@ -215,18 +229,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: const Text('GRADES'),
                                 onPressed: () {
                                   if (_formKey.currentState!.validate()) {
-                                    Navigator.push(context,
-                                        MaterialPageRoute(builder: (context) {
-                                      // print("xdd: $.length}");
-                                      return GradesView(
-                                          gradesCount: int.parse(
-                                              _gradesCountController.text),
-                                          classes: snapshot.data!
-                                              .findAllElements("class"));
-                                    }));
+                                    _navigateAndDisplaySelection(
+                                        context,
+                                        int.parse(_gradesCountController.text),
+                                        snapshot.data!
+                                            .findAllElements("class"));
                                   }
                                 },
-                              ))
+                              )),
                         ],
                       ))));
         } else if (snapshot.hasError) {
@@ -355,7 +365,7 @@ class _GradesView extends State<GradesView> {
                 ElevatedButton(
                   child: const Text('Calculate average'),
                   onPressed: () {
-                    Navigator.pop(context, MyHomePage(title: "back",));
+                    Navigator.pop(context, calculateAverage());
                   },
                 )
               ],
