@@ -47,6 +47,7 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
+  final num avg = 0;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -218,8 +219,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                         MaterialPageRoute(builder: (context) {
                                       // print("xdd: $.length}");
                                       return GradesView(
-                                          gradesCount:
-                                              int.parse(_gradesCountController.text),
+                                          gradesCount: int.parse(
+                                              _gradesCountController.text),
                                           classes: snapshot.data!
                                               .findAllElements("class"));
                                     }));
@@ -233,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
           return Text('Error: ${snapshot.error}');
         }
         // Otherwise, show a loading indicator
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       },
     );
   }
@@ -255,7 +256,7 @@ class _GradesView extends State<GradesView> {
   int gradesCount;
   Iterable<XmlElement> classes;
   _GradesView(this.gradesCount, this.classes);
-  List<int?> selections = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3];
+  List<int?> selections = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3];
 
   nodesToArray(nodes) {
     var arr = [];
@@ -274,7 +275,6 @@ class _GradesView extends State<GradesView> {
   }
 
   createRadioButtonGroupsv2() {
-    
     List<Widget> rows = [];
     for (int i = 0; i < gradesCount; i++) {
       Row row = Row(children: [
@@ -326,10 +326,19 @@ class _GradesView extends State<GradesView> {
     return Column(children: rows);
   }
 
+  calculateAverage() {
+    int sum = 0;
+    // double avg = 0;
+    for (int i = 0; i < gradesCount; i++) {
+      sum += selections[i]!;
+    }
+    return sum / gradesCount;
+  }
+
   @override
   Widget build(BuildContext context) {
     var classesList = nodesToArray(classes);
-    
+
     int sum = 0;
 
     return Scaffold(
@@ -337,7 +346,21 @@ class _GradesView extends State<GradesView> {
           title: Text('My View'),
         ),
         body: Center(
-          child: createRadioButtonGroupsv2(),
-        ));
+            child: Column(
+          children: [
+            createRadioButtonGroupsv2(),
+            Row(
+              children: [
+                Text("Your live average: " + calculateAverage().toString()),
+                ElevatedButton(
+                  child: const Text('Calculate average'),
+                  onPressed: () {
+                    Navigator.pop(context, MyHomePage(title: "back",));
+                  },
+                )
+              ],
+            )
+          ],
+        )));
   }
 }
