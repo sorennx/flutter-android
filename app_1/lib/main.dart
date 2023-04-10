@@ -91,6 +91,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final user_lang = "en-en";
 
+  bool isAvgVisible = false;
+  num avg = 0.0;
   Future<void> _navigateAndDisplaySelection(
       BuildContext context, gradesCount, classes) async {
     final result = await Navigator.push(
@@ -100,9 +102,21 @@ class _MyHomePageState extends State<MyHomePage> {
               GradesView(gradesCount: gradesCount, classes: classes)),
     );
     if (!mounted) return;
+    setState(() {
+      isAvgVisible = true;
+    });
+
+    avg = result;
+    // print(avg);
+    String text = "";
+    if (avg >= 3.0) {
+      text = "Congrats, those are passing grades!";
+    } else {
+      text = "Sadly, those are not passing grades.";
+    }
     ScaffoldMessenger.of(context)
-    ..removeCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text('$result')));
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
   }
 
   @override
@@ -237,6 +251,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                   }
                                 },
                               )),
+                          Visibility(
+                              visible: isAvgVisible,
+                              child: Text("Your average: $avg"))
                         ],
                       ))));
         } else if (snapshot.hasError) {
@@ -326,7 +343,6 @@ class _GradesView extends State<GradesView> {
             setState(() {
               selections[i] = value;
             });
-            print(selections);
           },
         ),
       ]);
