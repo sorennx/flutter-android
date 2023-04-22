@@ -22,6 +22,40 @@ class DatabaseHelper {
   ''');
   }
 
+  // General use methods
+
+  // Deletes all objects from given table
+  Future<int> removeAll(String tableName) async {
+    Database db = await instance.database;
+    return await db.delete(tableName);
+  }
+
+  // Inserts an object that was previously mapped to a given table
+  Future<int> insertObject(
+      String tableName, Map<String, dynamic> objectMap) async {
+    Database db = await instance.database;
+    return await db.insert(tableName, objectMap);
+  }
+
+  // Deletes an object of given id, from a given table
+  Future<int> deleteObject(String tableName, int id) async {
+    Database db = await instance.database;
+    return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
+  }
+
+  // Updates an object that was previously mapped, in a given table
+  Future<int> updateObject(
+      String tableName, Map<String, dynamic> objectMap) async {
+    int id = objectMap['id'];
+    Database db = await instance.database;
+    return await db
+        .update(tableName, objectMap, where: 'id = ?', whereArgs: [id]);
+  }
+
+  // Model specific methods
+
+  // Phone
+
   Future<List<Phone>> getPhones() async {
     Database db = await instance.database;
     var phones = await db.query('phones');
@@ -33,5 +67,37 @@ class DatabaseHelper {
   Future<int> addPhone(Phone phone) async {
     Database db = await instance.database;
     return await db.insert('phones', phone.toMap());
+  }
+
+  Future<int> removePhone(int id) async {
+    Database db = await instance.database;
+    return await db.delete('phones', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> addExamplePhones() async {
+    var phones = const [
+      Phone(
+        producent: 'Samsung',
+        model: 'S22 Ultra',
+        osVersion: '13',
+        website: 'samsung.com',
+      ),
+      Phone(
+        producent: 'Samsung',
+        model: 'S23 Ultra',
+        osVersion: '13',
+        website: 'samsung.com',
+      ),
+      Phone(
+        producent: 'Apple',
+        model: 'IPhone 13+',
+        osVersion: '13',
+        website: 'apple.com',
+      )
+    ];
+
+    for (var phone in phones) {
+      addPhone(phone);
+    }
   }
 }

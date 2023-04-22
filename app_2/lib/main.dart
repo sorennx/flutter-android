@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'phone.dart';
 import 'database_helper.dart';
+import 'views/add_phone.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,13 +33,41 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+enum MenuItem { deleteAll, addExamplePhones }
+
 class _MyHomePageState extends State<MyHomePage> {
+  Future<void> _navigateToAddPhone(BuildContext context) async {
+    final result = await Navigator.push(
+      context, MaterialPageRoute(builder: (context) => const AddPhoneView())
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title), actions: [
+        PopupMenuButton<MenuItem>(
+            onSelected: (value) {
+              switch (value) {
+                case MenuItem.deleteAll:
+                  DatabaseHelper.instance.removeAll('phones');
+                  break;
+                case MenuItem.addExamplePhones:
+                  DatabaseHelper.instance.addExamplePhones();
+                  break;
+                default:
+                  break;
+              }
+              setState(() {});
+            },
+            itemBuilder: (context) => [
+                  const PopupMenuItem(
+                      value: MenuItem.deleteAll, child: Text('Remove all')),
+                  const PopupMenuItem(
+                      value: MenuItem.addExamplePhones,
+                      child: Text('Add examples'))
+                ])
+      ]),
       body: Center(
           child: FutureBuilder<List<Phone>>(
               future: DatabaseHelper.instance.getPhones(),
@@ -48,13 +77,43 @@ class _MyHomePageState extends State<MyHomePage> {
                   return const Center(child: Text('Loading data..'));
                 }
                 return snapshot.data!.isEmpty
-                    ? const Center(child: Text('No phones available.'))
-                    : ListView(
-                        children: snapshot.data!.map((phone) {
-                        return Center(
-                          child: ListTile(title: Text("${phone.producent} ${phone.model}")),
-                        );
-                      }).toList());
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                            const Expanded(
+                              child:
+                                  Center(child: Text('No phones available.')),
+                            ),
+                            Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: FloatingActionButton(
+                                        child: const Icon(Icons.add),
+                                        onPressed: () {
+                                          _navigateToAddPhone(context);
+                                        })))
+                          ])
+                    : Column(children: [
+                        Expanded(
+                          child: ListView(
+                              children: snapshot.data!.map((phone) {
+                            return Center(
+                              child: ListTile(
+                                  title: Text(
+                                      "${phone.producent} ${phone.model}")),
+                            );
+                          }).toList()),
+                        ),
+                        Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: FloatingActionButton(
+                                    child: const Icon(Icons.add),
+                                    onPressed: () {})))
+                      ]);
               })),
     );
   }
