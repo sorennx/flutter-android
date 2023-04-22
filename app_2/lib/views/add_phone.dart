@@ -10,12 +10,56 @@ class AddPhoneView extends StatefulWidget {
 }
 
 class _AddPhoneView extends State<AddPhoneView> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: const Text('Add new phone')),
-        body: const Center(
-          child: Text("Yo"),
+        body: Center(
+          child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        hintText: "Enter manufacturer name",
+                        labelText: 'Manufacturer'),
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        hintText: "Enter model name",
+                        labelText: 'Model'),
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        hintText: "Enter OS version",
+                        labelText: 'OS version'),
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        hintText: "Enter website link",
+                        labelText: 'Website'),
+                  ),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text('Website'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text('Save'),
+                      ),
+                    ],
+                  )
+                ],
+              )),
         ));
   }
 }

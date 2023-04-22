@@ -38,8 +38,7 @@ enum MenuItem { deleteAll, addExamplePhones }
 class _MyHomePageState extends State<MyHomePage> {
   Future<void> _navigateToAddPhone(BuildContext context) async {
     final result = await Navigator.push(
-      context, MaterialPageRoute(builder: (context) => const AddPhoneView())
-    );
+        context, MaterialPageRoute(builder: (context) => const AddPhoneView()));
   }
 
   @override
@@ -112,7 +111,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 padding: const EdgeInsets.all(10.0),
                                 child: FloatingActionButton(
                                     child: const Icon(Icons.add),
-                                    onPressed: () {})))
+                                    onPressed: () {
+                                      _navigateToAddPhone(context);
+                                    })))
                       ]);
               })),
     );
