@@ -146,8 +146,11 @@ class _AddPhoneView extends State<AddPhoneView> {
                               savePhone();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text('Phone has been successfully added.'),
-                                    backgroundColor: Color.fromRGBO(56, 142, 60, 1),),
+                                  content: Text(
+                                      'Phone has been successfully added.'),
+                                  backgroundColor:
+                                      Color.fromRGBO(56, 142, 60, 1),
+                                ),
                               );
                               Navigator.pop(context);
                             }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/phone.dart';
-import '../config/database_helper.dart';
-import 'phone/add_phone.dart';
+import 'models/phone.dart';
+import 'config/database_helper.dart';
+import 'views/phone/add.dart';
+import 'views/phone/inspect.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +40,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _navigateToAddPhone(BuildContext context) async {
     final result = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => const AddPhoneView()));
+  }
+
+  Future<void> _navigateToInspectPhone(BuildContext context, Phone phone) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => InspectPhoneView(phone: phone)));
   }
 
   @override
@@ -99,10 +105,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: ListView(
                               children: snapshot.data!.map((phone) {
                             return Center(
+                                child: InkWell(
+                              onTap: () {
+                                _navigateToInspectPhone(context, phone);
+                                // print(phone);
+                              },
                               child: ListTile(
                                   title: Text(
                                       "${phone.producent} ${phone.model}")),
-                            );
+                            ));
                           }).toList()),
                         ),
                         Align(
