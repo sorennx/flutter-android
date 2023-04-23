@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'phone.dart';
-import 'database_helper.dart';
-import 'views/add_phone.dart';
+import '../models/phone.dart';
+import '../config/database_helper.dart';
+import 'phone/add_phone.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

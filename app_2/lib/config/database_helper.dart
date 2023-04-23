@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'phone.dart';
+import '../models/phone.dart';
 
 class DatabaseHelper {
   DatabaseHelper._privateConstuctor();
