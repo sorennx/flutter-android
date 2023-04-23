@@ -42,9 +42,31 @@ class _MyHomePageState extends State<MyHomePage> {
         context, MaterialPageRoute(builder: (context) => const AddPhoneView()));
   }
 
-  Future<void> _navigateToInspectPhone(BuildContext context, Phone phone) async {
+  Future<void> _navigateToInspectPhone(
+      BuildContext context, Phone phone) async {
     final result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => InspectPhoneView(phone: phone)));
+        context,
+        MaterialPageRoute(
+            builder: (context) => InspectPhoneView(
+                phone: phone, onPhoneUpdated: updatePhoneList)));
+  }
+
+  Future<List<Phone>> _phoneListFuture = DatabaseHelper.instance.getPhones();
+
+  Future<List<Phone>> fetchPhoneList() async {
+    return DatabaseHelper.instance.getPhones();
+  }
+
+  void updatePhoneList() {
+    setState(() {
+      _phoneListFuture = fetchPhoneList();
+    });
+  }
+
+  Future<List<Phone>> removePhoneFromList(Phone phoneToRemove) async {
+    List<Phone> phoneList = await _phoneListFuture;
+    phoneList.remove(phoneToRemove);
+    return Future.value(phoneList);
   }
 
   @override
@@ -56,9 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
               switch (value) {
                 case MenuItem.deleteAll:
                   DatabaseHelper.instance.removeAll('phones');
+                  updatePhoneList();
                   break;
                 case MenuItem.addExamplePhones:
                   DatabaseHelper.instance.addExamplePhones();
+                  updatePhoneList();
                   break;
                 default:
                   break;
@@ -75,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ]),
       body: Center(
           child: FutureBuilder<List<Phone>>(
-              future: DatabaseHelper.instance.getPhones(),
+              future: _phoneListFuture,
               builder:
                   (BuildContext context, AsyncSnapshot<List<Phone>> snapshot) {
                 if (!snapshot.hasData) {
@@ -105,15 +129,34 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: ListView(
                               children: snapshot.data!.map((phone) {
                             return Center(
-                                child: InkWell(
-                              onTap: () {
-                                _navigateToInspectPhone(context, phone);
-                                // print(phone);
-                              },
-                              child: ListTile(
-                                  title: Text(
-                                      "${phone.producent} ${phone.model}")),
-                            ));
+                                child: Dismissible(
+                                    background: Container(color: Colors.red),
+                                    key: Key(phone.id.toString()),
+                                    onDismissed: (direction) => {
+                                          setState(() {
+                                            DatabaseHelper.instance
+                                                .removePhone(phone.id!);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    '${phone.producent} ${phone.model} has been successfully deleted.'),
+                                                backgroundColor:
+                                                    const Color.fromRGBO(
+                                                        56, 142, 60, 1),
+                                              ),
+                                            );
+                                            removePhoneFromList(phone);
+                                          })
+                                        },
+                                    child: InkWell(
+                                      onTap: () {
+                                        _navigateToInspectPhone(context, phone);
+                                      },
+                                      child: ListTile(
+                                          title: Text(
+                                              "${phone.producent} ${phone.model}")),
+                                    )));
                           }).toList()),
                         ),
                         Align(

@@ -46,6 +46,7 @@ class DatabaseHelper {
   // Updates an object that was previously mapped, in a given table
   Future<int> updateObject(
       String tableName, Map<String, dynamic> objectMap) async {
+        print(objectMap['id']);
     int id = objectMap['id'];
     Database db = await instance.database;
     return await db
