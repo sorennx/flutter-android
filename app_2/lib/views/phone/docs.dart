@@ -20,7 +20,6 @@ class _PhoneDocsView extends State<PhoneDocsView>
   final progressNotifier = ValueNotifier<double?>(0);
 
   Future<void> downloadFileInfo() async {
-    createDownloadNotification();
     HttpClient httpClient = HttpClient();
     File file;
     String filePath = '';
@@ -54,7 +53,6 @@ class _PhoneDocsView extends State<PhoneDocsView>
   }
 
   Future<String> downloadFile() async {
-    
     HttpClient httpClient = HttpClient();
     File file;
     String filePath = '';
@@ -75,11 +73,29 @@ class _PhoneDocsView extends State<PhoneDocsView>
             onBytesReceived: (cumulative, total) => {
                   setState(() {
                     downloadedBytes = cumulative;
-                    print((downloadedBytes * 1.1).toInt());
+                    NotificationApi.showNotification(
+                        id: 0,
+                        title: "Downloading",
+                        body: "hi",
+                        payload: "download",
+                        maxProgress: (fileSize > 0
+                                ? fileSize
+                                : (downloadedBytes + 1) * 1.1)
+                            .toInt(),
+                        progress: downloadedBytes);
                   })
                 });
         setState(() {
           fileSize = downloadedBytes;
+          NotificationApi.showNotification(
+              id: 0,
+              title: "Downloading",
+              body: "hi",
+              payload: "download",
+              maxProgress:
+                  (fileSize > 0 ? fileSize : (downloadedBytes + 1) * 1.1)
+                      .toInt(),
+              progress: downloadedBytes);
         });
         filePath = '$dir/$fileName';
         file = File(filePath);
@@ -95,10 +111,12 @@ class _PhoneDocsView extends State<PhoneDocsView>
 
   void createDownloadNotification() {
     NotificationApi.showNotification(
-          title:  "Downloading",
-          body: "hi",
-          payload: "download"
-      );
+        title: "Downloading",
+        body: "hi",
+        payload: "download",
+        maxProgress:
+            (fileSize > 0 ? fileSize : (downloadedBytes + 1) * 1.1).toInt(),
+        progress: downloadedBytes);
   }
 
   @override
