@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/phone.dart';
 import '../../config/database_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
+import './docs.dart';
 
 class InspectPhoneView extends StatefulWidget {
   const InspectPhoneView(
@@ -48,13 +49,18 @@ class _InspectPhoneView extends State<InspectPhoneView> {
   }
 
   Future<void> _launchURL(String url) async {
-    final Uri uri = Uri(scheme:"https", host:url);
+    final Uri uri = Uri(scheme: "https", host: url);
     print(uri);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       throw "Cannot launch URL";
     }
+  }
+
+  Future<void> _navigateToDocs(BuildContext context, String downloadLink) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PhoneDocsView(downloadLink: downloadLink)));
   }
 
   @override
@@ -186,6 +192,14 @@ class _InspectPhoneView extends State<InspectPhoneView> {
                             }
                           },
                           child: const Text('Update'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            _navigateToDocs(context, widget.phone.website);
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green.shade300),
+                          child: const Text('Docs'),
                         ),
                       ],
                     ),
