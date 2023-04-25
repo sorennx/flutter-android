@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../push_notifications/notification_api.dart';
+
 class PhoneDocsView extends StatefulWidget {
   const PhoneDocsView({super.key, required this.downloadLink});
   final String downloadLink;
@@ -18,6 +20,7 @@ class _PhoneDocsView extends State<PhoneDocsView>
   final progressNotifier = ValueNotifier<double?>(0);
 
   Future<void> downloadFileInfo() async {
+    createDownloadNotification();
     HttpClient httpClient = HttpClient();
     File file;
     String filePath = '';
@@ -51,7 +54,8 @@ class _PhoneDocsView extends State<PhoneDocsView>
   }
 
   Future<String> downloadFile() async {
-    HttpClient httpClient = new HttpClient();
+    
+    HttpClient httpClient = HttpClient();
     File file;
     String filePath = '';
     String myUrl = '';
@@ -71,7 +75,7 @@ class _PhoneDocsView extends State<PhoneDocsView>
             onBytesReceived: (cumulative, total) => {
                   setState(() {
                     downloadedBytes = cumulative;
-                    print((downloadedBytes * 1.1 ).toInt() );
+                    print((downloadedBytes * 1.1).toInt());
                   })
                 });
         setState(() {
@@ -87,6 +91,14 @@ class _PhoneDocsView extends State<PhoneDocsView>
     }
 
     return filePath;
+  }
+
+  void createDownloadNotification() {
+    NotificationApi.showNotification(
+          title:  "Downloading",
+          body: "hi",
+          payload: "download"
+      );
   }
 
   @override
@@ -132,10 +144,12 @@ class _PhoneDocsView extends State<PhoneDocsView>
               ),
               LinearProgressIndicator(
                 backgroundColor: Colors.grey,
-                valueColor:
-                    downloadedBytes == fileSize ? AlwaysStoppedAnimation<Color>(Colors.green.shade300) : AlwaysStoppedAnimation<Color>(Colors.blue.shade400),
+                valueColor: downloadedBytes == fileSize
+                    ? AlwaysStoppedAnimation<Color>(Colors.green.shade300)
+                    : AlwaysStoppedAnimation<Color>(Colors.blue.shade400),
                 value: downloadedBytes /
-                    (fileSize > 0 ? fileSize : (downloadedBytes+1)*1.1).toDouble(),
+                    (fileSize > 0 ? fileSize : (downloadedBytes + 1) * 1.1)
+                        .toDouble(),
                 semanticsLabel: 'Linear progress indicator',
               ),
             ])));
