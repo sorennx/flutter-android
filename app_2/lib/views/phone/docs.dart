@@ -140,7 +140,7 @@ class _PhoneDocsView extends State<PhoneDocsView>
               Row(
                 children: <Widget>[
                   const Text('File size:'),
-                  Text(fileSize.toString())
+                  Text(fileSize > 0 ? fileSize.toString() : "?")
                 ],
               ),
               Row(
@@ -157,7 +157,7 @@ class _PhoneDocsView extends State<PhoneDocsView>
               Row(
                 children: <Widget>[
                   const Text('Download progress: '),
-                  Text('$downloadedBytes/$fileSize'),
+                  Text('$downloadedBytes/${fileSize > 0 ? fileSize : '?'}'),
                 ],
               ),
               LinearProgressIndicator(
