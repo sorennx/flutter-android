@@ -1,7 +1,12 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../push_notifications/notification_api.dart';
 
@@ -52,72 +57,49 @@ class _PhoneDocsView extends State<PhoneDocsView>
     }
   }
 
-  Future<String> downloadFile() async {
-    HttpClient httpClient = HttpClient();
-    File file;
-    String filePath = '';
-    String myUrl = '';
-    String url =
-        'https://filesamples.com/samples/video/mp4/sample_1280x720.mp4';
-    String fileName = '';
-    String dir = '';
-    try {
-      myUrl = url + '/' + fileName;
-      var request = await httpClient.getUrl(Uri.parse(url));
-      var response = await request.close();
-      if (response.statusCode == 200) {
-        fileSize = response.contentLength;
-        print(fileSize);
-        var bytes = await consolidateHttpClientResponseBytes(response,
-            autoUncompress: true,
-            onBytesReceived: (cumulative, total) => {
-                  setState(() {
-                    downloadedBytes = cumulative;
-                    NotificationApi.showNotification(
-                        id: 0,
-                        title: "Downloading",
-                        body: "hi",
-                        payload: "download",
-                        maxProgress: (fileSize > 0
-                                ? fileSize
-                                : (downloadedBytes + 1) * 1.1)
-                            .toInt(),
-                        progress: downloadedBytes);
-                  })
-                });
-        setState(() {
-          fileSize = downloadedBytes;
-          NotificationApi.showNotification(
-              id: 0,
-              title: "Downloading",
-              body: "hi",
-              payload: "download",
-              maxProgress:
-                  (fileSize > 0 ? fileSize : (downloadedBytes + 1) * 1.1)
-                      .toInt(),
-              progress: downloadedBytes);
-        });
-        filePath = '$dir/$fileName';
-        file = File(filePath);
-        await file.writeAsBytes(bytes);
-      } else
-        filePath = 'Error code: ' + response.statusCode.toString();
-    } catch (ex) {
-      filePath = 'Can not fetch url';
+  void downloadFile() async {
+    String url = 'https://filesamples.com/samples/video/mp4/sample_1280x720.mp4';
+
+    final status = await Permission.storage.request();
+    if (status.isGranted) {
+      final baseStorage = await getExternalStorageDirectory();
+
+      final id = await FlutterDownloader.enqueue(
+          url: url, savedDir: baseStorage!.path, fileName: DateTime.now().toString().replaceAll(".", "").replaceAll(" ", ""), saveInPublicStorage: true);
+          
+    } else {
+      print("no permission");
     }
+  }
+  double progress = 0;
+  ReceivePort receivePort = ReceivePort();
+  @override 
+  void initState(){
+    IsolateNameServer.registerPortWithName(receivePort.sendPort, "downloadFile");
+    receivePort.listen((message) {
+      setState(() {
+        progress = message;
+      });
+    });
 
-    return filePath;
+    FlutterDownloader.registerCallback(downloadCallback);
+    super.initState();
   }
 
-  void createDownloadNotification() {
-    NotificationApi.showNotification(
-        title: "Downloading",
-        body: "hi",
-        payload: "download",
-        maxProgress:
-            (fileSize > 0 ? fileSize : (downloadedBytes + 1) * 1.1).toInt(),
-        progress: downloadedBytes);
+  static downloadCallback(id, status, progress) {
+    SendPort sendPort = IsolateNameServer.lookupPortByName("downloadFile")!;
+    sendPort.send(progress);
   }
+
+  // void createDownloadNotification() {
+  //   NotificationApi.showNotification(
+  //       title: "Downloading",
+  //       body: "hi",
+  //       payload: "download",
+  //       maxProgress:
+  //           (fileSize > 0 ? fileSize : (downloadedBytes + 1) * 1.1).toInt(),
+  //       progress: downloadedBytes);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -147,9 +129,7 @@ class _PhoneDocsView extends State<PhoneDocsView>
                 children: <Widget>[const Text('File type:'), Text(fileType)],
               ),
               ElevatedButton(
-                onPressed: () {
-                  downloadFile();
-                },
+                onPressed: downloadFile,
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade300),
                 child: const Text('Download file'),
@@ -162,12 +142,10 @@ class _PhoneDocsView extends State<PhoneDocsView>
               ),
               LinearProgressIndicator(
                 backgroundColor: Colors.grey,
-                valueColor: downloadedBytes == fileSize
+                valueColor: progress < 100
                     ? AlwaysStoppedAnimation<Color>(Colors.green.shade300)
                     : AlwaysStoppedAnimation<Color>(Colors.blue.shade400),
-                value: downloadedBytes /
-                    (fileSize > 0 ? fileSize : (downloadedBytes + 1) * 1.1)
-                        .toDouble(),
+                value: 0,
                 semanticsLabel: 'Linear progress indicator',
               ),
             ])));

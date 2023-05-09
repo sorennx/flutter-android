@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'models/phone.dart';
 import 'config/database_helper.dart';
 import 'views/phone/add.dart';
@@ -6,6 +7,7 @@ import 'views/phone/inspect.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterDownloader.initialize();
   runApp(const MyApp());
 }
 
