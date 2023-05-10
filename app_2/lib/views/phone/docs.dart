@@ -58,15 +58,15 @@ class _PhoneDocsView extends State<PhoneDocsView>
   }
 
   void downloadFile() async {
-    String url = 'https://filesamples.com/samples/video/mp4/sample_1280x720.mp4';
+    String url = 'https://www.samplelib.com/lib/preview/mp4/sample-30s.mp4';
 
     final status = await Permission.storage.request();
     if (status.isGranted) {
       final baseStorage = await getExternalStorageDirectory();
-
+      
       final id = await FlutterDownloader.enqueue(
-          url: url, savedDir: baseStorage!.path, fileName: DateTime.now().toString().replaceAll(".", "").replaceAll(" ", ""), saveInPublicStorage: true);
-          
+          url: url, savedDir: baseStorage!.path, fileName: DateTime.now().toString().replaceAll(".", "").replaceAll(" ", ""), showNotification: true);
+      
     } else {
       print("no permission");
     }
@@ -76,9 +76,12 @@ class _PhoneDocsView extends State<PhoneDocsView>
   @override 
   void initState(){
     IsolateNameServer.registerPortWithName(receivePort.sendPort, "downloadFile");
-    receivePort.listen((message) {
+    receivePort.listen((dynamic data) {
       setState(() {
-        progress = message;
+        String id = data[0];
+        DownloadTaskStatus status = data[1];
+        progress = data[2];
+        // progress = message;
       });
     });
 
@@ -88,7 +91,8 @@ class _PhoneDocsView extends State<PhoneDocsView>
 
   static downloadCallback(id, status, progress) {
     SendPort sendPort = IsolateNameServer.lookupPortByName("downloadFile")!;
-    sendPort.send(progress);
+    
+    sendPort.send([id, status, progress]);
   }
 
   // void createDownloadNotification() {

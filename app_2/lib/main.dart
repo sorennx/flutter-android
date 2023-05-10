@@ -7,7 +7,7 @@ import 'views/phone/inspect.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterDownloader.initialize();
+  await FlutterDownloader.initialize(debug:true);
   runApp(const MyApp());
 }
 
