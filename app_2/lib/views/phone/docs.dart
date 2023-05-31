@@ -58,24 +58,31 @@ class _PhoneDocsView extends State<PhoneDocsView>
   }
 
   void downloadFile() async {
-    String url = 'https://www.samplelib.com/lib/preview/mp4/sample-30s.mp4';
+    // String url = 'https://www.samplelib.com/lib/preview/mp4/sample-30s.mp4';
+    String url =
+        'https://www.quintic.com/software/sample_videos/Golf_Putting_AutoTracking.avi';
 
     final status = await Permission.storage.request();
     if (status.isGranted) {
       final baseStorage = await getExternalStorageDirectory();
-      
+
       final id = await FlutterDownloader.enqueue(
-          url: url, savedDir: baseStorage!.path, fileName: DateTime.now().toString().replaceAll(".", "").replaceAll(" ", ""), showNotification: true);
-      
+          url: url,
+          savedDir: baseStorage!.path,
+          fileName:
+              DateTime.now().toString().replaceAll(".", "").replaceAll(" ", ""),
+          showNotification: true);
     } else {
       print("no permission");
     }
   }
+
   double progress = 0;
   ReceivePort receivePort = ReceivePort();
-  @override 
-  void initState(){
-    IsolateNameServer.registerPortWithName(receivePort.sendPort, "downloadFile");
+  @override
+  void initState() {
+    IsolateNameServer.registerPortWithName(
+        receivePort.sendPort, "downloadFile");
     receivePort.listen((dynamic data) {
       setState(() {
         String id = data[0];
@@ -91,19 +98,9 @@ class _PhoneDocsView extends State<PhoneDocsView>
 
   static downloadCallback(id, status, progress) {
     SendPort sendPort = IsolateNameServer.lookupPortByName("downloadFile")!;
-    
+
     sendPort.send([id, status, progress]);
   }
-
-  // void createDownloadNotification() {
-  //   NotificationApi.showNotification(
-  //       title: "Downloading",
-  //       body: "hi",
-  //       payload: "download",
-  //       maxProgress:
-  //           (fileSize > 0 ? fileSize : (downloadedBytes + 1) * 1.1).toInt(),
-  //       progress: downloadedBytes);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +130,9 @@ class _PhoneDocsView extends State<PhoneDocsView>
                 children: <Widget>[const Text('File type:'), Text(fileType)],
               ),
               ElevatedButton(
-                onPressed: downloadFile,
+                onPressed: () {
+                  downloadFile;
+                },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade300),
                 child: const Text('Download file'),
