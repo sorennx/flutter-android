@@ -131,7 +131,7 @@ class _PhoneDocsView extends State<PhoneDocsView>
               ),
               ElevatedButton(
                 onPressed: () {
-                  downloadFile;
+                  downloadFile();
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade300),
