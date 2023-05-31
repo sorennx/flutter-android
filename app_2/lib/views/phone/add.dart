@@ -3,11 +3,14 @@ import '../../models/phone.dart';
 import '../../config/database_helper.dart';
 
 class AddPhoneView extends StatefulWidget {
-  const AddPhoneView({super.key});
+  final PhoneAddedCallback onPhoneAdded;
+  const AddPhoneView({super.key, required this.onPhoneAdded});
+  
 
   @override
   State<AddPhoneView> createState() => _AddPhoneView();
 }
+typedef PhoneAddedCallback = void Function(Phone phone);
 
 class _AddPhoneView extends State<AddPhoneView> {
   final _formKey = GlobalKey<FormState>();
@@ -15,7 +18,7 @@ class _AddPhoneView extends State<AddPhoneView> {
   final modelFieldController = TextEditingController();
   final osVersionFieldController = TextEditingController();
   final websiteFieldController = TextEditingController();
-
+  
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -36,6 +39,16 @@ class _AddPhoneView extends State<AddPhoneView> {
     DatabaseHelper.instance.addPhone(phone);
   }
 
+  Phone savePhone2() {
+        var phone = Phone(
+        producent: manufacturerFieldController.text,
+        model: modelFieldController.text,
+        osVersion: osVersionFieldController.text,
+        website: websiteFieldController.text);
+
+        return phone;
+  }
+    
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,8 +155,14 @@ class _AddPhoneView extends State<AddPhoneView> {
                             child: const Text('Cancel')),
                         ElevatedButton(
                           onPressed: () {
+                            
                             if (_formKey.currentState!.validate()) {
-                              savePhone();
+                              // savePhone();
+                              var phone = savePhone2();
+                              widget.onPhoneAdded(phone);
+                              setState(() {
+                                
+                              });
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
@@ -152,7 +171,7 @@ class _AddPhoneView extends State<AddPhoneView> {
                                       Color.fromRGBO(56, 142, 60, 1),
                                 ),
                               );
-                              Navigator.pop(context);
+                              Navigator.pop(context, phone);
                             }
                           },
                           child: const Text('Save'),

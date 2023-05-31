@@ -7,7 +7,7 @@ import 'views/phone/inspect.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterDownloader.initialize(debug:true);
+  await FlutterDownloader.initialize(debug: true);
   runApp(const MyApp());
 }
 
@@ -41,7 +41,11 @@ enum MenuItem { deleteAll, addExamplePhones }
 class _MyHomePageState extends State<MyHomePage> {
   Future<void> _navigateToAddPhone(BuildContext context) async {
     final result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const AddPhoneView()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddPhoneView(
+                  onPhoneAdded: savePhone,
+                )));
   }
 
   Future<void> _navigateToInspectPhone(
@@ -63,6 +67,11 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _phoneListFuture = fetchPhoneList();
     });
+  }
+
+  Future<void> savePhone(Phone phone) async {
+    DatabaseHelper.instance.addPhone(phone);
+    updatePhoneList();
   }
 
   Future<List<Phone>> removePhoneFromList(Phone phoneToRemove) async {
